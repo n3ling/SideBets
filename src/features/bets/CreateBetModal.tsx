@@ -46,6 +46,21 @@ export function CreateBetModal({ jamId }: { jamId: string }) {
         type="number"
         value={line}
         onChange={(e) => setLine(Number(e.target.value))}
+        placeholder="Line"
+        className="border rounded w-full px-2 py-1"
+      />
+      <input
+        type="number"
+        value={overOdds}
+        onChange={(e) => setOverOdds(Number(e.target.value))}
+        placeholder="Over odds"
+        className="border rounded w-full px-2 py-1"
+      />
+      <input
+        type="number"
+        value={underOdds}
+        onChange={(e) => setUnderOdds(Number(e.target.value))}
+        placeholder="Under odds"
         className="border rounded w-full px-2 py-1"
       />
 

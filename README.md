@@ -72,3 +72,9 @@ export default defineConfig([
 ])
 ```
 # SideBets
+
+## Setup
+
+1. Copy `.env.example` to `.env` and fill in your Firebase config (from [Firebase Console](https://console.firebase.google.com) → Project settings → Your apps).
+2. Restrict your Firebase API key in [Google Cloud Console](https://console.cloud.google.com/apis/credentials) (Application restrictions → HTTP referrers for your domains).
+3. `npm install` then `npm run dev`.

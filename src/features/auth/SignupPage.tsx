@@ -7,11 +7,17 @@ export function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    await signup(email, password, displayName);
-    navigate("/me");
+    setError(null);
+    try {
+      await signup(email, password, displayName);
+      navigate("/me");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Sign up failed");
+    }
   }
 
   return (
@@ -40,6 +46,12 @@ export function SignupPage() {
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
         />
+
+        {error && (
+          <p className="text-red-600 text-sm" role="alert">
+            {error}
+          </p>
+        )}
 
         <button className="w-full bg-black text-white py-2 rounded">
           Sign up

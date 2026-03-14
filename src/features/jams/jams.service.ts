@@ -9,7 +9,6 @@ import {
   getDocs,
   collectionGroup,
   getDoc,
-  documentId,
 } from "firebase/firestore";
 import { db } from "../../firebase/firestore";
 
@@ -55,4 +54,15 @@ export async function getUserJams(userId: string) {
   );
 
   return jams;
+}
+
+export async function getMemberRole(
+  jamId: string,
+  userId: string
+): Promise<"admin" | "member" | null> {
+  const memberSnap = await getDoc(
+    doc(db, "jams", jamId, "members", userId)
+  );
+  const role = memberSnap.data()?.role;
+  return role === "admin" || role === "member" ? role : null;
 }

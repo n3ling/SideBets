@@ -6,11 +6,17 @@ export function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    await login(email, password);
-    navigate("/me");
+    setError(null);
+    try {
+      await login(email, password);
+      navigate("/me");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed");
+    }
   }
 
   return (
@@ -32,6 +38,12 @@ export function LoginPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+
+        {error && (
+          <p className="text-red-600 text-sm" role="alert">
+            {error}
+          </p>
+        )}
 
         <button className="w-full bg-black text-white py-2 rounded">
           Log in

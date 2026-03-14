@@ -1,31 +1,35 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { connectAuthEmulator } from "firebase/auth";
-import { connectFirestoreEmulator } from "firebase/firestore";
-import { auth } from "./auth";
-import { db } from "./firestore";
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+function getEnv(key: keyof ImportMetaEnv): string {
+  const value = import.meta.env[key];
+  if (value === undefined || value === "") {
+    throw new Error(
+      `Missing env: ${key}. Copy .env.example to .env and fill in your Firebase config.`
+    );
+  }
+  return value as string;
+}
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyBSfml2qp_W3mi1NjRTt6ATAUtTGQHkZW0",
-  authDomain: "sidebets-bd1a8.firebaseapp.com",
-  projectId: "sidebets-bd1a8",
-  storageBucket: "sidebets-bd1a8.firebasestorage.app",
-  messagingSenderId: "215396088874",
-  appId: "1:215396088874:web:41af030e3c384398a0d753",
-  measurementId: "G-19KW549503",
+  apiKey: getEnv("VITE_FIREBASE_API_KEY"),
+  authDomain: getEnv("VITE_FIREBASE_AUTH_DOMAIN"),
+  projectId: getEnv("VITE_FIREBASE_PROJECT_ID"),
+  storageBucket: getEnv("VITE_FIREBASE_STORAGE_BUCKET"),
+  messagingSenderId: getEnv("VITE_FIREBASE_MESSAGING_SENDER_ID"),
+  appId: getEnv("VITE_FIREBASE_APP_ID"),
+  measurementId: getEnv("VITE_FIREBASE_MEASUREMENT_ID"),
 };
 
-// Initialize Firebase
 export const app = initializeApp(firebaseConfig);
 export const analytics = getAnalytics(app);
 
+// Optional: use Firebase emulators in development
 // if (import.meta.env.DEV) {
+//   const { connectAuthEmulator } = await import("firebase/auth");
+//   const { connectFirestoreEmulator } = await import("firebase/firestore");
+//   const { auth } = await import("./auth");
+//   const { db } = await import("./firestore");
 //   connectAuthEmulator(auth, "http://localhost:9099");
 //   connectFirestoreEmulator(db, "localhost", 8080);
 // }

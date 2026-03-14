@@ -4,14 +4,7 @@ import {
 } from "firebase/auth";
 import { auth } from "../../firebase/auth";
 import { db } from "../../firebase/firestore";
-import {
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-  serverTimestamp,
-  setDoc,
-} from "firebase/firestore";
+import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 
 export function login(email: string, password: string) {
   return signInWithEmailAndPassword(auth, email, password);
