@@ -1,0 +1,94 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isJamMember(jamId) {
+      return exists(
+        /databases/$(database)/documents/jams/$(jamId)/members/$(request.auth.uid)
+      );
+    }
+
+    function isJamAdmin(jamId) {
+      return get(
+        /databases/$(database)/documents/jams/$(jamId)/members/$(request.auth.uid)
+      ).data.role == "admin";
+    }
+
+    match /users/{userId} {
+      allow read, create: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    match /{path=**}/members/{memberId} {
+      allow read: if
+        request.auth != null &&
+        resource.data.userId == request.auth.uid;
+    }
+
+    match /jams/{jamId} {
+      allow create: if isSignedIn();
+
+      allow read: if isSignedIn() && isJamMember(jamId);
+
+      allow update, delete: if isJamAdmin(jamId);
+
+      match /members/{memberId} {
+
+        allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+
+        allow create: if
+          isSignedIn() &&
+            (
+              (memberId == request.auth.uid &&
+                get(/databases/$(database)/documents/jams/$(jamId)).data.ownerId
+                == request.auth.uid
+              )
+              ||
+              isJamAdmin(jamId)
+            );
+      }
+  	}
+    
+    match /jams/{jamId}/bets/{betId} {
+
+  		// Members can read bets
+  		allow read: if isJamMember(jamId);
+
+  		// Members can create bets
+  		allow create: if isJamMember(jamId)
+    		&& request.resource.data.authorId == request.auth.uid
+    		&& request.resource.data.status == "open";
+
+  		// Only author OR admin can update bet metadata
+  		allow update: if
+  			isJamMember(jamId)
+   		 	&& (
+      	isJamAdmin(jamId) ||
+      	resource.data.authorId == request.auth.uid
+    	)
+    	// prevent editing after lock
+    	&& resource.data.status == "open";
+
+  		// Only admin can delete bets
+  		allow delete: if isJamAdmin(jamId);
+		}
+    
+    match /jams/{jamId}/bets/{betId}/selections/{uid} {
+
+      allow read: if isJamMember(jamId);
+
+      allow create: if
+        isJamMember(jamId)
+        && uid == request.auth.uid
+        && get(
+          /databases/$(database)/documents/jams/$(jamId)/bets/$(betId)
+        ).data.status == "open";
+
+      // No updates — users must cancel & re-place
+      allow update, delete: if false;
+    }
+	}
+}
